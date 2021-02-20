@@ -1,0 +1,31 @@
+.list {
+    border-collapse: collapse;
+    border-spacing: 0;
+    caption-side: top;
+    empty-cells: show;
+    table-layout: auto; // auto | fixed
+    width: 100%;
+
+    &__head {
+        background-color: #e0e0e0;
+        font-size: large;
+        font-weight: bold;
+    }
+
+    &__data {
+        font-size: small;
+        font-weight: normal;
+
+        &:nth-child(3n) {
+            background-color: #eeeeee;
+        }
+
+        &:hover{
+            background-color: #aaccaa !important;
+        }
+    }
+
+    &__cell {
+        border: 1px dotted grey;
+    }
+}

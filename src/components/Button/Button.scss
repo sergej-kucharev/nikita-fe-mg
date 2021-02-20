@@ -1,0 +1,11 @@
+.button {
+    display: inline-flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 6px;
+    border-width: 1px;
+    margin: 4px;
+    padding: 4px 6px;
+}
