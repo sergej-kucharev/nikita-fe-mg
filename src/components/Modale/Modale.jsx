@@ -1,3 +1,5 @@
+'use strict';
+
 import { useRef, } from 'react';
 import PropTypes from 'prop-types';
 
@@ -15,7 +17,15 @@ export const Modale = ({
         if (event.target !== modale.current) return;
         onClose();
     };
-    return (<div className="modale" ref={ modale } onClick={ onClick }>{ children }</div>);
+    return (
+        <div
+            className="modale"
+            ref={ modale }
+            onClick={ onClick }
+        >
+            { children }
+        </div>
+    );
 };
 Modale.propTypes = {
     show: PropTypes.bool.isRequired,

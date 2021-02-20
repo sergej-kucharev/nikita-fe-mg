@@ -1,3 +1,5 @@
+'use strict';
+
 import { BrowserRouter, Switch, Route, Redirect, } from 'react-router-dom';
 
 import { Bank, } from '../containers/Bank';

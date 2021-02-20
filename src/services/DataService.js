@@ -1,3 +1,5 @@
+'use strict';
+
 export class DataService {
     constructor(...keys) {
         const events = keys.reduce((K, k) => ({ ...K, [k]: [], }), {});

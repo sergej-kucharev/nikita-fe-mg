@@ -1,3 +1,5 @@
+'use strict';
+
 import { DataService, } from '../DataService';
 
 export class BankService extends DataService {
