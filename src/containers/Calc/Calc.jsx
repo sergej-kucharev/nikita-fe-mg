@@ -5,6 +5,30 @@ import { bankService, } from '../../services';
 
 import { Button, } from '../../components/Button';
 
+const init = {
+    bank: {},
+    form: {
+        initialLoan: 0,
+	    downPayment: 0,
+    },
+};
+
 export const Calc = withRouter((props) => {
-    return null;
+    const bankId = props?.match?.params?.bankId;
+
+    const [bank, setBank] = useState({ ...init.bank });
+    const [form, setForm] = useState({ ...init.form });
+
+    useEffect(() => {
+        const load = async () => {
+            const options = { id: bankId, };
+            const bank = await bankService.read(options);
+            await setBank(bank);
+        };
+        load();
+    }, [bankId]);
+
+    console.log({ bank });
+
+    return 'Calc';
 });
