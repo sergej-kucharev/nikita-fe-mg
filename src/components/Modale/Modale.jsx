@@ -1,5 +1,3 @@
-'use strict';
-
 import { useRef, } from 'react';
 import PropTypes from 'prop-types';
 
@@ -9,14 +7,19 @@ export const Modale = ({
     onClose,
 }) => {
     const modale = useRef(null);
+    
     if (!show) {
         return null;
     }
+
     const onClick = (event) => {
+        if (!['click'].includes(event.type)) return;
+        if (!modale) return;
+        if (![modale.current].includes(event.target)) return;
         event.preventDefault();
-        if (event.target !== modale.current) return;
         onClose();
     };
+
     return (
         <div
             className="modale"

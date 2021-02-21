@@ -1,6 +1,8 @@
 import { useState, } from 'react';
 import PropTypes from 'prop-types';
 
+import { bankService, } from '../../services';
+
 import { Button, } from '../Button';
 
 
@@ -12,36 +14,54 @@ export const PopupBank = ({
     onAccept,
     onCancel,
 }) => {
-    const [item, setItem] = useState(bank);
-    let title, disabled = true, onSubmit, acceptText;
+    const [item, setItem] = useState({});
+    const onChange = (key, cast) => ({ target: { value }}) => setItem({
+        ...item,
+        [key]: cast ? cast(value) : value,
+    });
+
+    let title, acceptText, cancelText = 'Cancel';
+    let disabled = false, onSubmit;
     if (removeId) {
         title = 'Remove';
-        onSubmit = async () => {
+        acceptText = 'Remove';
+        disabled = true;
+        onSubmit = async (event) => {
+            event.preventDefault();
+            console.log('submit remove');
+            await bankService.delete({ id: removeId });
             await onAccept();
         };
-        acceptText = 'Remove';
     } else if (editId) {
         title = 'Edit';
-        disabled = false;
-        onSubmit = async () => {
+        acceptText = 'Edit';        
+        onSubmit = async (event) => {
+            event.preventDefault();
+            console.log('submit edit');
+            await bankService.update({ id: editId, ...item });
             await onAccept();
         };
-        acceptText = 'Edit';        
     } else if (add) {
         title = 'Add';
-        disabled = false;
-        onSubmit = async () => {
+        acceptText = 'Add';
+        onSubmit = async (event) => {
+            event.preventDefault();
+            console.log('submit add');
+            await bankService.create({ ...item });
             await onAccept();
         };
-        acceptText = 'Add';
     } else {
         return null;
     }
-    const onChange = (key) => ({ target: { value }}) => setItem({
-        [key]: ['name'].includes(key) ? value : +value
-    });
+
     return (
-        <form className="popup-bank" onSubmit={ onSubmit } >
+        <form
+            className="popup-bank"
+            method="POST"
+            encType="multypart/form-data"
+            onSubmit={ onSubmit }
+            onReset={ onCancel }
+        >
             <h3>{ title }</h3>
             <dl>
                 <dt>ID</dt>
@@ -49,16 +69,17 @@ export const PopupBank = ({
                     <input
                         type="number"
                         disabled={ true }
-                        value={ item.id }
-                        onChange={ onChange('id') }
+                        value={ item.id ?? bank.id ?? '' }
+                        onChange={ onChange('id', Number) }
                     />
                     </dd>
                 <dt>Name</dt>
                 <dd>
                     <input
                         type="text"
+                        autoFocus={ true }
                         disabled={ disabled }
-                        value={ item.name }
+                        value={ item.name ?? bank.name ?? '' }
                         onChange={ onChange('name') }
                     />
                 </dd>
@@ -68,8 +89,8 @@ export const PopupBank = ({
                         type="number"
                         disabled={ disabled }
                         min={ 1 }
-                        value={ item.maximumLoan }
-                        onChange={ onChange('maximumLoan') }
+                        value={ item.maximumLoan ?? bank.maximumLoan ?? '' }
+                        onChange={ onChange('maximumLoan', Number) }
                     />
                 </dd>
                 <dt>Minimum Down Payment</dt>
@@ -78,8 +99,8 @@ export const PopupBank = ({
                         type="number"
                         disabled={ disabled }
                         min={ 1 }
-                        value={ item.minimumDownPayment }
-                        onChange={ onChange('minimumDownPayment') }
+                        value={ item.minimumDownPayment ?? bank.minimumDownPayment ?? '' }
+                        onChange={ onChange('minimumDownPayment', Number) }
                     />
                 </dd>
                 <dt>Interest Rate</dt>
@@ -90,8 +111,8 @@ export const PopupBank = ({
                         max={ 100 }
                         min={ 1 }
                         step={ 0.1 }
-                        value={ item.interestRate }
-                        onChange={ onChange('interestRate') }
+                        value={ item.interestRate ?? bank.interestRate ?? '' }
+                        onChange={ onChange('interestRate', Number) }
                     />
                 </dd>
                 <dt>Loan Term</dt>
@@ -100,14 +121,14 @@ export const PopupBank = ({
                         type="number"
                         disabled={ disabled }
                         min={ 1 }
-                        value={ item.loanTerm }
-                        onChange={ onChange('loanTerm') }
+                        value={ item.loanTerm ?? bank.loanTerm ?? '' }
+                        onChange={ onChange('loanTerm', Number) }
                     />
                 </dd>
             </dl>
             <div>
                 <Button type="submit" >{ acceptText }</Button>
-                <Button onClick={ onCancel } >Cancel</Button>
+                <Button type="reset" >{ cancelText }</Button>
             </div>
         </form>
     );

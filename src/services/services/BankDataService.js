@@ -1,5 +1,3 @@
-'use strict';
-
 import { DataService, } from '../DataService';
 
 export class BankService extends DataService {
@@ -7,16 +5,60 @@ export class BankService extends DataService {
         super('list', 'create', 'read', 'update', 'delete');
     }
 
+    url(...path) {
+        return super.url('/api/v1/bank', ...path);
+    }
+
     async list({ filter, order, skip, take }) {
-        const encode = (value) => btoa(JSON.stringify(value));
-        const url = this.url('/api/v1/bank');
-        Object.keys(filter).length && url.searchParams.set('filter', encode(filter));
-        order.length && url.searchParams.set('order', encode(order));
+        const url = this.url();
+        Object.keys(filter).length && url.searchParams.set('filter', this.encode(filter));
+        order.length && url.searchParams.set('order', this.encode(order));
         skip>0 && url.searchParams.set('skip', skip);
         take>0 && url.searchParams.set('take', take);
-        const resource = await fetch(url);
-        const data = await resource.json();
-        await this.emit('list', data);
-        return data;
+        // https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
+        // https://stackoverflow.com/questions/29775797/fetch-post-json-data
+        const resource = await fetch(url, {
+            method: 'GET',
+            headers: this.headers(),
+        });
+        const json = await resource.json();
+        await this.emit('list', json);
+        return json;
+    }
+
+    async create({ ...params }) {
+        const url = this.url();
+        const resource = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify({ ...params }),
+            headers: this.headers(),
+        });
+        const json = await resource.json();
+        await this.emit('create', json);
+        return json;
+    }
+
+    async update({ id, ...params }) {
+        const url = this.url(id);
+        const resource = await fetch(url, {
+            method: 'PATCH',
+            body: JSON.stringify({ ...params }),
+            headers: this.headers(),
+        });
+        const json = await resource.json();
+        await this.emit('update', json);
+        return json;
+    }
+
+    async delete({ id, ...params }) {
+        const url = this.url(id);
+        const resource = await fetch(url, {
+            method: 'DELETE',
+            body: JSON.stringify({ ...params }),
+            headers: this.headers(),
+        });
+        const json = await resource.json();
+        await this.emit('delete', json);
+        return json;
     }
 };

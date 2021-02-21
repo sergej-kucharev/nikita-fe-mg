@@ -1,0 +1,38 @@
+.page {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-end;
+    align-items: center;
+    margin: 12px 18px;
+
+    &__state {
+        font-size: x-small;
+        padding: 0 6px;
+    }
+
+    &__skip, &__show {
+        &::after {
+            content: '/';
+            margin: 0 4px;
+        }
+    }
+    &__total {}
+
+
+    &__item {
+        font-weight: bold;
+        padding: 8px 12px;
+
+        &:hover {
+            filter: invert(0.8);
+        }
+
+        &_first, &_last {}
+        &_prev, &_next {}
+        &_current {
+            filter: invert(1) !important;
+        }
+    }
+
+
+}

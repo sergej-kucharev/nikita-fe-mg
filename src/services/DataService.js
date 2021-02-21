@@ -1,5 +1,4 @@
-'use strict';
-
+const { resolve, } = require('path');
 export class DataService {
     constructor(...keys) {
         const events = keys.reduce((K, k) => ({ ...K, [k]: [], }), {});
@@ -35,7 +34,24 @@ export class DataService {
         });
     };
 
-    url(path) {
-        return new URL(path, 'http://localhost:4000');
+    encode(value) {
+        return btoa(JSON.stringify(value));
+    }
+
+    headers(setter = {}, unsetter = []) {
+        const data = Object.entries({
+            'accept': 'application/json',
+            'content-type': 'application/json',
+            ...setter,
+        }).filter(([key]) => {
+            return !unsetter.includes(key);
+        }).map(([key, value]) => {
+            return { [key]: value };
+        });
+        return Object.assign({}, ...data);
+    }
+
+    url(...path) {
+        return new URL(resolve(...path.map(String)), 'http://localhost:4000');
     }
 };

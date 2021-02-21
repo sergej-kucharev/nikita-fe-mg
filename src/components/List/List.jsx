@@ -1,40 +1,48 @@
-'use strict';
-
 import PropTypes from 'prop-types';
 
 export const List = ({
     cfg,
     data,
 }) => {
-    const th = ({ title, }, key) => (
-        <th className="list__cell" key={ key }>{ title() }</th>
+    const th = ({ title, ...options }, key) => (
+        <th className="list__table_cell" key={ key }>
+            { title instanceof Function ? title({ title, ...options }) : title }
+        </th>
     );
     const td = (options, key) => (
-        <th className="list__cell" key={ key }>{ options.cell(options) }</th>
+        <td className="list__table_cell" key={ key }>
+            { options.cell(options) }
+        </td>
     );
     const tr = (data, className, td) => data.map((row, rowId, data) => (
         <tr className={ className } key={ rowId }>
-            { cfg.map((cfg, key) => td({ ...cfg, value: row[cfg.$], row, data, }, key)) }
+            {
+                cfg.map((cfg, key) => {
+                    return td({
+                        ...cfg,
+                        columnId: key,
+                        row,
+                        rowId,
+                        data,
+                        value: row[cfg.$],
+                    }, key);
+                })
+            }
         </tr>
     ));
     return (
-        <table className="list">
-            <thead>{ tr([{}], "list__head", th) }</thead>
-            <tbody>{ tr(data.items, "list__data", td) }</tbody>
-        </table>
+        <div className="list">
+            <table className="list__table">
+                <thead>{ tr([{}], "list__table_head", th) }</thead>
+                <tbody>{ tr(data.items, "list__table_body", td) }</tbody>
+            </table>
+        </div>
     );
 };
 List.propTypes = {
     cfg: PropTypes.arrayOf(PropTypes.object).isRequired,
     data: PropTypes.exact({
         count: PropTypes.number.isRequired,
-        items: PropTypes.arrayOf(PropTypes.shape({
-            id: PropTypes.number.isRequired,
-            name: PropTypes.string.isRequired,
-            interestRate: PropTypes.number.isRequired,
-            loanTerm: PropTypes.number.isRequired,
-            maximumLoan: PropTypes.number.isRequired,
-            minimumDownPayment: PropTypes.number.isRequired,
-        })).isRequired,
+        items: PropTypes.arrayOf(PropTypes.object).isRequired,
     }).isRequired,
 };

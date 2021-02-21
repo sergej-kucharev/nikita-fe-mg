@@ -1,3 +1,29 @@
 .bank {
-    
+  &-index,
+  &-id,
+  &-name,
+  &-interest-rate,
+  &-loan-term,
+  &-maximum-loan,
+  &-minimum-down-payment,
+  &-actions {
+    padding: 4px 6px;
+  }
+
+  td &-index,
+  td &-id {
+    text-align: right;
+  }
+
+  td &-name {
+    text-align: left;
+  }
+
+  td &-interest-rate,
+  td &-loan-term,
+  td &-maximum-loan,
+  td &-minimum-down-payment,
+  td &-actions {
+    text-align: center;
+  }
 }
