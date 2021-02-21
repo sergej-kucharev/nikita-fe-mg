@@ -1,4 +1,5 @@
 import { useState, useEffect, } from 'react';
+import { withRouter, } from 'react-router-dom';
 
 import { bankService, } from '../../services';
 
@@ -8,18 +9,30 @@ import { Modale, } from '../../components/Modale';
 import { PopupBank, } from '../../components/PopupBank';
 import { Page, } from '../../components/Page';
 
-const renderActions = ({ setModale, }) => ({ className, row, }) => {
+const renderActions = ({
+    props,
+    setModale,
+}) => ({
+    className,
+    row,
+}) => {
+    const onCalc = () => props.history.push(`/calc/${ row.id }`, );
     const onEdit = () => setModale({ editId: row.id, });
     const onRemove = () => setModale({ removeId: row.id, });
     return (
         <div className={ className }>
+            <Button onClick={ onCalc }>calc</Button>
             <Button onClick={ onEdit }>/</Button>
             <Button onClick={ onRemove }>-</Button>
         </div>
     );
 };
 
-const renderAdd = ({ setModale, }) => ({ className, }) => {
+const renderAdd = ({
+    setModale,
+}) => ({
+    className,
+}) => {
     const onAdd = () => setModale({ add: true, });
     return (
         <div className={ className }>
@@ -28,23 +41,74 @@ const renderAdd = ({ setModale, }) => ({ className, }) => {
     );
 };
 
-const renderCell = ({ unit, }) => ({ className, value, row, data, }) => {
+const renderCell = ({
+    unit,
+}) => ({
+    className,
+    value,
+    $,
+    row,
+    data,
+}) => {
     return (
-        <div className={className}>
+        <div
+            className={className}
+            data-key={ $ }
+        >
             { `${ value }${ unit ? ` ${ unit }` : '' }` }
         </div>
     );
 };
 
-const renderTitle = ({ title, part, setPart, }) => ({ className, }) => {
+const renderTitle = ({
+    title,
+    part,
+    setPart,
+}) => ({
+    $,
+    className,
+    orderable=false,
+}) => {
+    const { order } = part;
+
+    const orderIndex = (key) => {
+        const index = order.findIndex(([k]) => k === key) + 1;
+        return index ? index : null;
+    };
+    const orderBy = (key) => order.find(([k]) => k === key)?.[1] ?? null;
+
+    const onClick = (key, orderBy, orderIndex) => (event) => {
+        event.preventDefault();
+        let orderNew = order.filter(([k]) => k !== key);
+        if (orderIndex!==1) {
+            orderNew.unshift([key, 'asc']);
+        } else if (orderBy === 'asc') {
+            orderNew.unshift([key, 'desc']);
+        } else if (orderBy === 'desc') {
+            // reset order by key
+        }
+        setPart({ ...part, order: orderNew, });
+    };
+
     return (
-        <div className={ className }>
+        <div
+            className={ [className, orderable ? 'list__orderable' : ''].join(' ') }
+            data-oby={ orderBy($) }
+            data-oid={ orderIndex($) }
+            onClick={ orderable && onClick($, orderBy($), orderIndex($)) }
+        >
             { title }
         </div>
     );
 };
 
-const listConfig = ({ page, index, setModale, ...cfg }) => [{
+const listConfig = ({
+    props,
+    page,
+    index,
+    setModale,
+    ...cfg
+}) => [{
     $: 'index',
     cell: ({ className, rowId, }) => {
         return (
@@ -59,35 +123,41 @@ const listConfig = ({ page, index, setModale, ...cfg }) => [{
     $: 'id',
     cell: renderCell({ ...cfg, }),
     className: 'bank-id',
+    orderable: true,
     title: renderTitle({ ...cfg, title: 'ID', }),
 }, {
     $: 'name',
     cell: renderCell({ ...cfg, }),
     className: 'bank-name',
+    orderable: true,
     title: renderTitle({ ...cfg, title: 'Name', }),
 }, {
     $: 'interestRate',
     cell: renderCell({ ...cfg, unit: '%', }),
     className: 'bank-interest-rate',
+    orderable: true,
     title: renderTitle({ ...cfg, title: 'Interest rate', }),
 }, {
     $: 'loanTerm',
     cell: renderCell({ ...cfg, unit: 'month', }),
     className: 'bank-loan-term',
+    orderable: true,
     title: renderTitle({ ...cfg, title: 'Loan term', }),
 }, {
     $: 'maximumLoan',
     cell: renderCell({ ...cfg, unit: '$', }),
     className: 'bank-maximum-loan',
+    orderable: true,
     title: renderTitle({ ...cfg, title: 'Maximum loan', }),
 }, {
     $: 'minimumDownPayment',
     cell: renderCell({ ...cfg, unit: '$', }),
     className: 'bank-minimum-down-payment',
+    orderable: true,
     title: renderTitle({ ...cfg, title: 'Minimum down payment', }),
 }, {
     $: 'actions',
-    cell: renderActions({ setModale, }),
+    cell: renderActions({ props, setModale, }),
     className: 'bank-actions',
     title: renderAdd({ setModale, }),
 },].map(config => {
@@ -111,7 +181,7 @@ const init = {
     modale: { add: false, editId: 0, removeId: 0, },
 };
 
-export const Bank = () => {
+export const Bank = withRouter((props) => {
     const [part, setPart] = useState({ ...init.part });
     const [page, setPage] = useState({ ...init.page });
     const [index, setIndex] = useState([ ...init.index ]);
@@ -128,7 +198,15 @@ export const Bank = () => {
     }, [part, page]);
 
     const listOptions = {
-        cfg: listConfig({ part, page, index, modale, setModale, setPart, }),
+        cfg: listConfig({
+            props,
+            part,
+            page,
+            index,
+            modale,
+            setModale,
+            setPart,
+        }),
         data,
         setIndex,
     };
@@ -176,4 +254,4 @@ export const Bank = () => {
             </Modale>
         </>
     );
-};
+});

@@ -9,10 +9,18 @@ export function App() {
     <div>
       <BrowserRouter>
         <Switch>
-          <Route exact strict path="/"><Redirect to="/bank" /></Route>
-          <Route exact strict path="/bank"><Bank /></Route>
-          <Route exact strict path="/calc"><Calc /></Route>
-          <Route ><NotFound /></Route>
+          <Route exact strict path="/">
+            <Redirect to="/bank" />
+          </Route>
+          <Route exact strict path="/bank">
+            <Bank />
+          </Route>
+          <Route exact strict path="/calc/:bankId(\d+)">
+            <Calc />
+          </Route>
+          <Route >
+            <NotFound />
+          </Route>
         </Switch>
       </BrowserRouter>
     </div>

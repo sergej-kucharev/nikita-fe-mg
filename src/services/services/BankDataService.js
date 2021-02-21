@@ -38,6 +38,17 @@ export class BankService extends DataService {
         return json;
     }
 
+    async read({ id }) {
+        const url = this.url(id);
+        const resource = await fetch(url, {
+            method: 'GET',
+            headers: this.headers(),
+        });
+        const json = await resource.json();
+        await this.emit('read', json);
+        return json;
+    }
+
     async update({ id, ...params }) {
         const url = this.url(id);
         const resource = await fetch(url, {

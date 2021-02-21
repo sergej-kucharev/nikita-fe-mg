@@ -1,6 +1,27 @@
 .list {
     margin: 12px 18px;
 
+    &__orderable {
+        cursor: pointer;
+        position: relative;
+
+        &[data-oid]::before {
+            content: attr(data-oid);
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: xx-small;
+        }
+
+        &[data-oby]::after {
+            content: attr(data-oby);
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            font-size: xx-small;
+        }
+    }
+
     &__table {
         border-collapse: collapse;
         border-spacing: 0;
